@@ -1,38 +1,48 @@
-from transformers import Wav2Vec2Processor, Wav2Vec2Model
+from transformers import AutoProcessor, HubertModel
 import soundfile as sf
+import numpy as np
+import pandas as pd
 import librosa
+import os
 
-processor = Wav2Vec2Processor.from_pretrained("facebook/hubert-large-ls960-ft")
-model = Wav2Vec2Model.from_pretrained("facebook/hubert-large-ls960-ft")
+processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
+model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
+
+def get_wav_files(directory, debug=False):
+    wav_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".wav"):
+                # Extract the label (subfolder name)
+                label = os.path.basename(root)
+                # Construct the full path to the WAV file
+                file_path = os.path.join(root, file)
+                # Append tuple containing file path and label to list
+                wav_files.append((file_path, label))
+    if debug:
+        # Print file paths and corresponding labels
+        for file_path, label in wav_files:
+            print(f"File Path: {file_path}, Label: {label}")
+    return wav_files
 
 def resample_audio(audio, original_sr, target_sr):
     return librosa.resample(audio, orig_sr=original_sr, target_sr=target_sr)
 
 def map_to_array(file_path):
-    speech, sample_rate = sf.read(file_path)
+    track, sample_rate = sf.read(file_path)
     if sample_rate != 16000:  # If the sample rate is not 16 kHz, resample it
-        speech = resample_audio(speech, sample_rate, 16000)
+        track = resample_audio(track, sample_rate, 16000)
         sample_rate = 16000
-    return speech, sample_rate
+    return track, sample_rate
 
-# Assuming wav_files is a list of tuples containing file paths and their corresponding labels
-# wav_files = [("path_to_wav_file1.wav", "label1"), ("path_to_wav_file2.wav", "label2"), ...]
-wav_files = [('data/Pressed/a4_I_pressed_norm.wav', 'Pressed')]
+def wav_to_embedding(file_path):
+    # Load each WAV file, map it to an array and its sample rate
+    track, sample_rate = map_to_array(file_path)
 
-# Load each WAV file, map it to an array and its sample rate
-data = [map_to_array(file_path) for file_path, _ in wav_files]
+    # Preprocess each array and convert it into input values
+    input_value = processor(track, sampling_rate=sample_rate, return_tensors="pt").input_values
 
-# Preprocess each array and convert it into input values
-input_values = []
-for speech, sample_rate in data:
-    input_values.append(processor(speech, sampling_rate=sample_rate, return_tensors="pt").input_values)
+    # Pass the input values through the model to get the hidden states
+    hidden_state = model(input_value).last_hidden_state
 
-# Pass the input values through the model to get the hidden states
-hidden_states = []
-for input_value in input_values:
-    hidden_states.append(model(input_value).last_hidden_state)
-
-print(hidden_states)
-
-
-# wav_files = [('data/Pressed/a4_I_pressed_norm.wav', 'Pressed')]
+    return hidden_state

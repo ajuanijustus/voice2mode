@@ -164,3 +164,7 @@ phon/
 
 # Soprano wav data
 data/
+unit_test_data/
+
+# outputs
+*.csv
