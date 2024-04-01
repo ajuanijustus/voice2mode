@@ -26,7 +26,13 @@ def get_wav_files(directory, debug=False):
     return wav_files
 
 def resample_audio(audio, original_sr, target_sr):
-    return librosa.resample(audio, orig_sr=original_sr, target_sr=target_sr)
+    # Resample the audio
+    resampled_audio = librosa.resample(audio, orig_sr=original_sr, target_sr=target_sr)
+    
+    # Normalize the amplitude
+    normalized_audio = librosa.util.normalize(resampled_audio)
+    
+    return normalized_audio
 
 def map_to_array(file_path):
     track, sample_rate = sf.read(file_path)
@@ -42,7 +48,8 @@ def wav_to_embedding(file_path):
     # Preprocess each array and convert it into input values
     input_value = processor(track, sampling_rate=sample_rate, return_tensors="pt").input_values
 
-    # Pass the input values through the model to get the hidden states
-    hidden_state = model(input_value).last_hidden_state
+    # Pass the input values through the model to get all hidden states
+    outputs = model(input_value, output_hidden_states=True)
+    hidden_states = outputs.hidden_states
 
-    return hidden_state
+    return hidden_states
