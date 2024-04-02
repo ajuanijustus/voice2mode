@@ -159,9 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Virtual environment (phon)
-phon/
-
 # Soprano wav data
 data/
 unit_test_data/

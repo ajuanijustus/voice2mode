@@ -1,12 +1,10 @@
 from transformers import AutoProcessor, HubertModel
+from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import soundfile as sf
 import numpy as np
 import pandas as pd
 import librosa
 import os
-
-processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
-model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
 
 def get_wav_files(directory, debug=False):
     wav_files = []
@@ -41,15 +39,28 @@ def map_to_array(file_path):
         sample_rate = 16000
     return track, sample_rate
 
-def wav_to_embedding(file_path):
+def wav_to_embedding(file_path, model_name='hubert'):
+    # Select processor and model based on the specified model name
+    if model_name == 'hubert':
+        processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
+        model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
+    elif model_name == 'wav2vec2base':
+        processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+        model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
+    elif model_name == 'wav2vec2large':
+        processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
+        model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-large-960h")
+    else:
+        raise ValueError("Invalid model name. Please choose from 'hubert', 'wav2vec2base', or 'wav2vec2large'.")
+
     # Load each WAV file, map it to an array and its sample rate
     track, sample_rate = map_to_array(file_path)
 
     # Preprocess each array and convert it into input values
-    input_value = processor(track, sampling_rate=sample_rate, return_tensors="pt").input_values
+    input_values = processor(track, sampling_rate=sample_rate, return_tensors="pt").input_values
 
     # Pass the input values through the model to get all hidden states
-    outputs = model(input_value, output_hidden_states=True)
+    outputs = model(input_values, output_hidden_states=True)
     hidden_states = outputs.hidden_states
 
     return hidden_states
