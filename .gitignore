@@ -162,6 +162,9 @@ cython_debug/
 # Soprano wav data
 data/
 unit_test_data/
+results/
+embeddings/
 
 # outputs
 *.csv
+*.npy
