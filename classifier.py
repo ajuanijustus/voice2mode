@@ -98,7 +98,7 @@ def k_fold_cross_val(data_directory, model_name, k=5):
     embeddings_df = pd.DataFrame(embeddings, columns=['Soundtrack', 'Label', 'Layer', 'Embedding'])
 
     # Create a DataFrame to store results
-    results_df = pd.DataFrame({'Actual_Label': [], 'Predicted_Label': [], 'Layer': []})
+    results_df = pd.DataFrame({'Layer': []})
 
     # Iterate through each layer
     for layer_num in tqdm.tqdm(embeddings_df['Layer'].unique(), desc="Layer-wise Cross-validation"):
@@ -119,10 +119,50 @@ def k_fold_cross_val(data_directory, model_name, k=5):
         # Store cross-validation results
         for fold_num, accuracy in enumerate(cv_scores):
             fold_results_df = pd.DataFrame({
-                'Layer': layer_num,
-                'Fold': fold_num,
-                'Fold_Accuracy': accuracy
-            })
+                'Layer': [layer_num],
+                'Fold': [fold_num],
+                'Fold_Accuracy': [accuracy]
+            }, index=[0])
             results_df = pd.concat([results_df, fold_results_df], ignore_index=True)
 
     return results_df
+
+from sklearn.model_selection import GridSearchCV
+
+def svm_hyperparameter_tuning(data_directory, model_name, layer, param_grid, cv=5):
+    wav_files = get_wav_files(data_directory)
+    
+    embeddings = []
+    for file_path, label in tqdm.tqdm(wav_files, desc="Processing WAV files"):
+        # Obtain the embedding for the current WAV file
+        embedding_tensors = wav_to_embedding(file_path, model_name)
+        
+        # Flatten each layer's embedding and store them separately
+        for layer_num, embedding_tensor in enumerate(embedding_tensors):
+            embedding = embedding_tensor.detach().numpy().flatten()
+            
+            if len(embedding) < 80000:
+                embedding = np.pad(embedding, (0, 80000 - len(embedding)))
+            else:
+                embedding = embedding[:80000]
+                
+            # Append the file name, label, and flattened embedding to the data list
+            embeddings.append((file_path, label, layer_num, embedding))
+
+    # Convert the data list to a DataFrame
+    embeddings_df = pd.DataFrame(embeddings, columns=['Soundtrack', 'Label', 'Layer', 'Embedding'])
+
+    phonation_mode_df = embeddings_df[embeddings_df['Layer'] == layer].copy(deep=True)
+    # Extract embeddings for the current layer
+    max_length = max(len(embedding) for embedding in phonation_mode_df['Embedding'])
+    X = np.array(list(phonation_mode_df['Embedding']))
+    y = phonation_mode_df['Label']
+
+    svm_classifier = SVC(kernel='linear')
+    grid_search = GridSearchCV(svm_classifier, param_grid, cv=cv)
+    grid_search.fit(X, y)
+    
+    best_params = grid_search.best_params_
+    best_score = grid_search.best_score_
+    
+    return best_params, best_score

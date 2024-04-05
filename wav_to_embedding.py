@@ -6,6 +6,10 @@ import pandas as pd
 import librosa
 import os
 
+# Define global variables for processor and model
+processor = None
+model = None
+
 def get_wav_files(directory, debug=False):
     wav_files = []
     for root, dirs, files in os.walk(directory):
@@ -40,18 +44,22 @@ def map_to_array(file_path):
     return track, sample_rate
 
 def wav_to_embedding(file_path, model_name='hubert'):
-    # Select processor and model based on the specified model name
-    if model_name == 'hubert':
-        processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
-        model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
-    elif model_name == 'wav2vec2base':
-        processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
-        model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
-    elif model_name == 'wav2vec2large':
-        processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
-        model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-large-960h")
-    else:
-        raise ValueError("Invalid model name. Please choose from 'hubert', 'wav2vec2base', or 'wav2vec2large'.")
+
+    global processor, model
+    
+    # Initialize processor and model if not already initialized
+    if processor is None or model is None:
+        if model_name == 'hubert':
+            processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
+            model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
+        elif model_name == 'wav2vec2base':
+            processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+            model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
+        elif model_name == 'wav2vec2large':
+            processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
+            model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-large-960h")
+        else:
+            raise ValueError("Invalid model name. Please choose from 'hubert', 'wav2vec2base', or 'wav2vec2large'.")
 
     # Load each WAV file, map it to an array and its sample rate
     track, sample_rate = map_to_array(file_path)
