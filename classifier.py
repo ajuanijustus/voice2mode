@@ -102,15 +102,6 @@ def classify_phonation_mode(model_name):
 
     return results_df
 
-import os
-import numpy as np
-import pandas as pd
-import tqdm
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedKFold
-from sklearn.svm import SVC
-from sklearn.metrics import confusion_matrix
 
 def k_fold_cross_val(model_name, k=5):
     # Create a DataFrame to store results
@@ -160,6 +151,7 @@ def k_fold_cross_val(model_name, k=5):
 
             # Generate confusion matrix
             y_pred = svm_classifier.predict(X_test)
+            class_labels = ["Flow", "Breathy", "Pressed", "Normal"]
             cm = confusion_matrix(y_test, y_pred)
             confusion_matrices.append((layer_num, fold_num, cm))
 
