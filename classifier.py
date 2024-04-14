@@ -151,7 +151,7 @@ def k_fold_cross_val(model_name, k=5):
 
             # Generate confusion matrix
             y_pred = svm_classifier.predict(X_test)
-            class_labels = ["Flow", "Breathy", "Pressed", "Normal"]
+            class_labels = ["Breathy", "Normal", "Pressed", "Flow"]
             cm = confusion_matrix(y_test, y_pred)
             confusion_matrices.append((layer_num, fold_num, cm))
 
