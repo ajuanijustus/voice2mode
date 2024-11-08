@@ -72,3 +72,29 @@ def wav_to_embedding(file_path, model_name='hubert'):
     hidden_states = outputs.hidden_states
 
     return hidden_states
+
+def wav2input(file_path, model_name='hubert'):
+
+    global processor, model
+    
+    # Initialize processor and model if not already initialized
+    if processor is None or model is None:
+        if model_name == 'hubert':
+            processor = AutoProcessor.from_pretrained("facebook/hubert-large-ls960-ft")
+            model = HubertModel.from_pretrained("facebook/hubert-large-ls960-ft")
+        elif model_name == 'wav2vec2base':
+            processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+            model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
+        elif model_name == 'wav2vec2large':
+            processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-960h")
+            model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-large-960h")
+        else:
+            raise ValueError("Invalid model name. Please choose from 'hubert', 'wav2vec2base', or 'wav2vec2large'.")
+
+    # Load each WAV file, map it to an array and its sample rate
+    track, sample_rate = map_to_array(file_path)
+
+    # Preprocess each array and convert it into input values
+    input_values = processor(track, sampling_rate=sample_rate, return_tensors="pt").input_values
+
+    return input_values
