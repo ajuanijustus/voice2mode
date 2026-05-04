@@ -6,7 +6,7 @@
 
 > **voice2mode: Singing Phonation Mode Classification with Speech Foundation Models**  
 > Aju Ani Justus, Ruchit Agrawal, Sudarsana Reddy Kadiri, Shrikanth Narayanan, ICASSP Workshop Proceedings (Speech, Music and Mind), 2026
-> [link here after the paper is out]()
+> [doi.org/10.1109/ICASSP55912.2026.11460695](http://doi.org/10.1109/ICASSP55912.2026.11460695)
 
 
 ## Overview
@@ -128,9 +128,18 @@ See the [paper](#citation) for detailed results, layer-wise analysis, and confus
 
 ## Citation
 
-If you use this code or dataset, please cite:
+If you use this code or finding from the paper, please cite:
 
-> fill with bibtex after publication
+```
+@inproceedings{voice2mode,
+  author={Justus, Aju Ani and Agrawal, Ruchit and Kadiri, Sudarsana Reddy and Narayanan, Shrikanth},
+  booktitle={ICASSP 2026 - 2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={voice2mode: Phonation Mode Classification in Singing Using Self-Supervised Speech Models}, 
+  year={2026},
+  pages={22072-22076},
+  doi={10.1109/ICASSP55912.2026.11460695}
+}
+```
 
 ---
 
