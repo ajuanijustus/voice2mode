@@ -1,0 +1,17 @@
+transformers
+torch
+soundfile
+numpy
+pandas
+librosa
+tqdm
+matplotlib
+seaborn
+scipy
+ipython
+notebook
+ipykernel
+python_speech_features
+scikit-learn
+xgboost
+tensorflow

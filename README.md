@@ -20,7 +20,6 @@ Traditional approaches to singing phonation mode classification rely on handcraf
 - Benchmarks against standard baselines (spectrogram, mel-spectrogram, MFCC).
 - Reproducible experiments on a public soprano singing dataset.
 
----
 
 ## Table of Contents
 
@@ -33,7 +32,6 @@ Traditional approaches to singing phonation mode classification rely on handcraf
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
----
 
 ## Installation
 
@@ -43,51 +41,52 @@ Traditional approaches to singing phonation mode classification rely on handcraf
    cd voice2mode
    ```
 
-2. **Install dependencies:**
+2. **Set up the environment:**
+   We recommend using Python 3.10 via Conda to ensure smooth library integration (especially for macOS users running XGBoost):
    ```bash
+   conda create -n voice2mode python=3.10 -y
+   conda activate voice2mode
+   conda install -c conda-forge xgboost -y
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install --upgrade pip
    pip install -r requirements.txt
    ```
-   Main dependencies include:
-   - Python 3.8+
-   - PyTorch
-   - torchaudio
-   - scikit-learn
-   - xgboost
-   - librosa
-   - numpy, pandas, matplotlib
+   Main dependencies include PyTorch, TensorFlow, Transformers, SoundFile, Librosa, Scikit-Learn, and Jupyter Notebook.
 
----
 
 ## Usage
 
-### 1. **Prepare the Dataset**
+### 1. Prepare the Dataset
 
-Download the [Soprano Phonation Modes Dataset](http://www.proutskova.de/phonation-modes/) and place the audio files in the `data/` directory. See [Dataset](#dataset) for details.
+Download the [Soprano Phonation Modes Dataset](http://www.proutskova.de/phonation-modes/) and place the audio files in the `data/` directory (see [Dataset](#dataset) for details), or you can use your own voice dataset.
 
-### 2. **Feature Extraction**
+📬 Need help? If you run into issues formatting or structuring your dataset, feel free to mail me at research@ajuanijustus.com!
 
-Extract embeddings from pre-trained models:
+### 2. Feature Extraction and Classification
+
+Instead of command-line scripts, the entire pipeline is executed sequentially via Jupyter Notebooks.
+Open Jupyter:
 ```bash
-python extract_features.py --model hubert --input_dir data/ --output_dir features/
+jupyter notebook
 ```
+Run notebooks 1 through 4 to handle feature extraction, embedding generation, and baseline/advanced classification models. Running these notebooks will automatically create a `results/` directory. All generated classification reports, CSV logs, and visual performance charts (e.g., confusion matrices) are cleanly outputted directly to `results/`.
+
+Supported classifiers: `svm`, `xgboost`.
 Supported models: `hubert`, `wav2vec2-base`, `wav2vec2-large`.
 
-### 3. **Train and Evaluate Classifiers**
+### 3. Evaluate Models and Classifiers
 
-Run classification experiments:
-```bash
-python classify.py --features_dir features/ --classifier svm
-```
-Supported classifiers: `svm`, `xgboost`.
+To evaluate all models side-by-side and completely reproduce the main results, tables, and figures from the paper, execute the final evaluation notebook: `5_evaluation.ipynb`.
 
-### 4. **Reproduce Paper Results**
+### 4. Repository Architecture and Helper Functions
 
-To reproduce the main results and tables from the paper:
-```bash
-python run_experiments.py --config configs/paper.yaml
-```
-
----
+The standalone Python files in the root folder act as core utility scripts behind the scenes. If you want to dive deeper, tweak the pipeline, or look for optimizations, feel free to explore them:
+1. `wav_to_embedding.py`: Handles loading audio files and passing them through deep self-supervised models (transformers) to extract rich audio embedding vectors.
+2. `baseline_features.py`: Manages classical audio DSP feature extraction (MFCCs, deltas, spectral features) via librosa.
+3. `classifier.py`: Contains the architectures and training logic for the downstream classifiers (SVM, XGBoost, and Neural Networks).
 
 ## Dataset
 
@@ -98,7 +97,6 @@ We use the [Soprano Phonation Modes Dataset](http://www.proutskova.de/phonation-
 
 **Note:** The dataset is publicly available under a Creative Commons license. Please cite the original authors if you use the data.
 
----
 
 ## Results
 
@@ -116,15 +114,12 @@ We use the [Soprano Phonation Modes Dataset](http://www.proutskova.de/phonation-
 
 See the [paper](#citation) for detailed results, layer-wise analysis, and confusion matrices.
 
----
 
 ## Reproducibility
 
-- All experiments can be reproduced using the provided scripts and configuration files.
-- Results are based on 5-fold stratified cross-validation.
-- See `configs/` for example experiment setups.
-
----
+- All experiments can be reproduced end-to-end using the sequential notebooks.
+- Results are validated using a rigorous 5-fold stratified cross-validation setup.
+- For archive purposes, an unmaintained notebook (`archive/rl_classification_archive.ipynb`) exploring Reinforcement Learning for classification is retained in the repository for posterity.
 
 ## Citation
 
@@ -141,13 +136,11 @@ If you use this code or finding from the paper, please cite:
 }
 ```
 
----
 
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).
 
----
 
 ## Acknowledgements
 
@@ -156,4 +149,4 @@ This repository is licensed under the [MIT License](LICENSE).
 
 ---
 
-For questions or contributions, please open an issue or pull request.
+For questions, collaboration, or contributions, please open an issue, submit a pull request, or drop me an email at research@ajuanijustus.com.
