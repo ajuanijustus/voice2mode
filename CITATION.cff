@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this code or the findings, please cite the paper below."
+title: "voice2mode"
+type: software
+authors:
+  - given-names: "Aju Ani"
+    family-names: "Justus"
+    affiliation: "University of Birmingham"
+  - given-names: "Ruchit"
+    family-names: "Agrawal"
+  - given-names: "Sudarsana Reddy"
+    family-names: "Kadiri"
+  - given-names: "Shrikanth"
+    family-names: "Narayanan"
+license: MIT
+repository-code: "https://github.com/ajuanijustus/voice2mode"
+keywords:
+  - phonation mode classification
+  - singing voice
+  - self-supervised learning
+  - speech models
+preferred-citation:
+  type: conference-paper
+  title: "voice2mode: Phonation Mode Classification in Singing Using Self-Supervised Speech Models"
+  authors:
+    - given-names: "Aju Ani"
+      family-names: "Justus"
+    - given-names: "Ruchit"
+      family-names: "Agrawal"
+    - given-names: "Sudarsana Reddy"
+      family-names: "Kadiri"
+    - given-names: "Shrikanth"
+      family-names: "Narayanan"
+  collection-title: "ICASSP 2026 - 2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
+  year: 2026
+  start: 22072
+  end: 22076
+  doi: "10.1109/ICASSP55912.2026.11460695"
